@@ -1,0 +1,104 @@
+# Config cho training VietOCR với dataset tên tiếng Việt
+# Dataset: 145,962 ảnh tên người Việt Nam
+# Image height: 32px
+
+# Vocabulary - Bao gồm tất cả ký tự tiếng Việt có dấu
+vocab: 'aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ0123456789 '
+
+# Thiết bị: cuda:0 (GPU), cuda (auto), hoặc cpu
+# Nếu không có GPU, đổi thành: cpu
+device: cuda:0
+
+# Kiến trúc sequence modeling
+# Lựa chọn: transformer (chính xác nhất), seq2seq (nhanh nhất), convseq2seq
+seq_modeling: transformer
+
+# Cấu hình Transformer
+transformer:  
+    d_model: 256              # Kích thước embedding vector
+    nhead: 8                   # Số attention heads
+    num_encoder_layers: 6      # Số encoder layers
+    num_decoder_layers: 6      # Số decoder layers
+    dim_feedforward: 2048      # Kích thước feedforward network
+    max_seq_length: 1024       # Độ dài sequence tối đa (128)
+    pos_dropout: 0.1           # Dropout cho positional encoding
+    trans_dropout: 0.1         # Dropout cho transformer
+
+# Backbone CNN
+# Sử dụng VGG19 với batch normalization (tốc độ và accuracy cân bằng)
+backbone: vgg19_bn
+cnn:
+    pretrained: true           # Sử dụng pretrained weights từ ImageNet
+    ss:                        # Pooling stride size
+        - [2, 2]
+        - [2, 2]
+        - [2, 1]
+        - [2, 1]
+        - [1, 1]         
+    ks:                        # Pooling kernel size
+        - [2, 2]
+        - [2, 2]
+        - [2, 1]
+        - [2, 1]
+        - [1, 1]
+    hidden: 256                # Số channels output của CNN
+
+# Cấu hình Optimizer
+optimizer:
+    max_lr: 0.0003             # Learning rate tối đa (OneCycleLR)
+    pct_start: 0.1             # Phần trăm iterations cho warm-up phase
+
+# Cấu hình Training
+trainer:
+    batch_size: 32             # Số ảnh mỗi batch (giảm xuống 16 nếu GPU nhỏ)
+    print_every: 200           # In thông tin training mỗi N iterations
+    valid_every: 2000          # Validate mỗi N iterations
+    iters: 50000               # Tổng số iterations (50k cho 145k ảnh)
+    
+    # Đường dẫn lưu model
+    export: ../weights/vietnamese_names_best.pth
+    checkpoint: ../checkpoint/vietnamese_names_checkpoint.pth
+    log: ../logs/vietnamese_names_train.log
+    
+    # Metrics: số mẫu để tính accuracy khi validate
+    # null = không tính accuracy (nhanh hơn)
+    # 500 = tính trên 500 mẫu validation
+    metrics: 500
+
+# Cấu hình Dataset
+dataset:    
+    # Tên dataset
+    name: vietnamese_names
+    
+    # Đường dẫn tới thư mục gốc chứa ảnh
+    data_root: ../dataset/
+    
+    # File annotation (tạo bằng prepare_dataset.py)
+    train_annotation: train_annotation.txt
+    valid_annotation: val_annotation.txt
+    
+    # Kích thước ảnh
+    image_height: 32           # Chiều cao ảnh (dataset của bạn đã là 32px)
+    image_min_width: 32        # Chiều rộng tối thiểu
+    image_max_width: 512       # Chiều rộng tối đa
+
+# Cấu hình DataLoader
+dataloader:
+    num_workers: 2             # Số workers load data song song (2-4 tùy CPU)
+    pin_memory: true           # Tăng tốc transfer CPU->GPU
+
+# Data Augmentation
+aug:
+    image_aug: true            # Bật augmentation (xoay, blur, thay đổi độ sáng...)
+    masked_language_model: true # Random mask 5% tokens (kỹ thuật từ BERT)
+
+# Cấu hình Prediction
+predictor:
+    beamsearch: false          # Tắt beam search khi validate (nhanh hơn)
+
+# Pretrained weights (có thể comment nếu train from scratch)
+# Sử dụng pretrained weights giúp hội tụ nhanh hơn
+pretrain: https://vocr.vn/data/vietocr/vgg_transformer.pth
+
+# Chế độ quiet (ít log hơn)
+quiet: false
