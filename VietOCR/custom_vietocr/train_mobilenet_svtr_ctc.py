@@ -361,8 +361,9 @@ class CTCTrainer:
                 target_lengths = torch.tensor(target_lengths, dtype=torch.long)
                 targets = torch.tensor(targets_list, dtype=torch.long)
                 
-                # Compute CTC loss
-                loss = self.criterion(log_probs, targets, input_lengths, target_lengths)
+                # Compute CTC loss (CTC doesn't support Half precision, cast to float32)
+                log_probs_fp32 = log_probs.float()
+                loss = self.criterion(log_probs_fp32, targets, input_lengths, target_lengths)
             
             # Backward with AMP
             self.optimizer.zero_grad()
@@ -442,8 +443,9 @@ class CTCTrainer:
                 target_lengths = torch.tensor(target_lengths, dtype=torch.long)
                 targets = torch.tensor(targets_list, dtype=torch.long)
                 
-                # Loss
-                loss = self.criterion(log_probs, targets, input_lengths, target_lengths)
+                # Loss (CTC doesn't support Half precision, cast to float32)
+                log_probs_fp32 = log_probs.float()
+                loss = self.criterion(log_probs_fp32, targets, input_lengths, target_lengths)
                 
                 # Decode predictions (greedy for validation speed)
                 preds = torch.argmax(logits, dim=-1)  # (N, T)
