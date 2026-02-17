@@ -3,6 +3,7 @@ from torch import nn
 
 import vietocr.model.backbone.vgg as vgg
 from vietocr.model.backbone.resnet import Resnet50
+from vietocr.model.backbone.mobilenetv3 import mobilenetv3_large
 
 
 class CNN(nn.Module):
@@ -15,6 +16,8 @@ class CNN(nn.Module):
             self.model = vgg.vgg19_bn(**kwargs)
         elif backbone == "resnet50":
             self.model = Resnet50(**kwargs)
+        elif backbone == "mobilenetv3_large":
+            self.model = mobilenetv3_large(**kwargs)
 
     def forward(self, x):
         return self.model(x)

@@ -1,0 +1,101 @@
+# Configuration cho MobileNet-SVTR-CTC Model
+# Kiến trúc tối ưu cho nhận diện tên tiếng Việt
+
+# Đường dẫn dataset
+dataset:
+  data_root: ./dataset/
+  train_annotation: train_annotation.txt  # File chứa đường dẫn ảnh và label
+  valid_annotation: valid_annotation.txt
+  train_folder: ./dataset/images/train/
+  valid_folder: ./dataset/images/valid/
+
+# Cấu hình vocab
+# CTC vocab: blank token tự động thêm vào index 0
+# Chỉ cần list các characters (không cần pad, sos, eos như VietOCR)
+vocab: 'aAàÀảẢãÃáÁạẠăĂằĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ0123456789 '
+
+# Thông số model
+model:
+  name: 'mobilenet_svtr_ctc'  # Tên model
+  backbone: 'mobilenetv3_large'  # MobileNetV3-Large
+  
+  # Backbone params
+  backbone_hidden: 256  # Hidden size từ backbone (256 cho standard, 128 cho light)
+  
+  # SVTR Neck params
+  neck_hidden: 256  # Hidden size của SVTR neck
+  svtr_depth: 2  # Số SVTR blocks (1-2 cho tiny, 2-4 cho small)
+  svtr_heads: 8  # Số attention heads (4-8)
+  
+  # Dropout
+  dropout: 0.1
+  
+  # CTC params
+  seq_modeling: 'ctc'  # Sử dụng CTC
+  
+  # Pretrained
+  pretrained: false  # True nếu muốn load pretrained backbone
+
+# Cấu hình training
+train:
+  batch_size: 64  # Batch size (có thể tăng lên 64-128 nếu GPU đủ mạnh)
+  epochs: 100
+  
+  # Image size
+  image_height: 32  # Chiều cao ảnh input
+  image_width: 256  # Chiều rộng ảnh input (có thể điều chỉnh theo tên)
+  
+  # Optimizer
+  optimizer: 'adam'
+  learning_rate: 0.0003  # Learning rate ban đầu
+  weight_decay: 0.00001
+  
+  # Learning rate scheduler
+  scheduler: 'cosine'  # cosine annealing
+  warmup_epochs: 5  # Số epochs warmup
+  min_lr: 0.00001  # Learning rate tối thiểu
+  
+  # AMP (Automatic Mixed Precision) - Tăng tốc training, giảm memory
+  use_amp: true  # true = FP16 (nhanh hơn ~2x), false = FP32 (chậm nhưng stable hơn)
+  
+  # CTC specific
+  blank_idx: 0  # Index của blank token trong vocab
+  
+  # Early stopping
+  patience: 15  # Dừng sớm nếu không improve sau 15 epochs
+  
+  # Checkpoint
+  save_dir: ./weights/mobilenet_svtr_ctc/
+  save_interval: 5  # Lưu checkpoint mỗi 5 epochs
+
+# Cấu hình validation
+validation:
+  batch_size: 64  # Batch lớn hơn cho validation
+  metrics:
+    - 'accuracy'  # Character-level accuracy
+    - 'cer'  # Character Error Rate
+    - 'wer'  # Word Error Rate
+  
+# Cấu hình device
+device: 'cuda'  # 'cuda' hoặc 'cpu'
+num_workers: 4  # Số workers cho DataLoader
+
+# Logging
+logging:
+  log_interval: 100  # Log mỗi 100 iterations
+  tensorboard: true  # Sử dụng tensorboard
+  log_dir: ./logs/mobilenet_svtr_ctc/
+
+# ===== LIGHT VERSION CONFIG =====
+# Uncomment dưới đây nếu muốn dùng phiên bản light (nhanh hơn, nhẹ hơn)
+# model:
+#   name: 'mobilenet_svtr_ctc_light'
+#   backbone_hidden: 128  # Giảm xuống 128
+#   neck_hidden: 128
+#   svtr_depth: 1  # Chỉ 1 block
+#   svtr_heads: 4  # 4 heads
+#   dropout: 0.1
+
+# train:
+#   batch_size: 64  # Có thể tăng batch size
+#   learning_rate: 0.0005  # Learning rate cao hơn một chút
