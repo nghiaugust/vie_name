@@ -67,7 +67,7 @@ dataset:
     image_max_width: 512
 
 dataloader:
-    num_workers: 3
+    num_workers: 0 # lỗi khi num_workers > 0
     pin_memory: True
 
 aug:
