@@ -42,20 +42,35 @@ class CollatorCTC:
         # Find max label length
         max_label_len = max(len(sample["word"]) for sample in batch)
         
+        # Find max image width in batch
+        max_width = max(sample["img"].shape[2] for sample in batch)
+        
         for sample in batch:
-            img.append(sample["img"])
+            # Get image (C, H, W)
+            image = sample["img"]
             filenames.append(sample["img_path"])
             
-            label = sample["word"]
-            label_len = len(label)
+            # Pad image to max_width with 0 (black padding)
+            c, h, w = image.shape
+            if w < max_width:
+                # Pad on the right side
+                pad_width = max_width - w
+                padded_img = np.zeros((c, h, max_width), dtype=np.float32)
+                padded_img[:, :, :w] = image
+                img.append(padded_img)
+            else:
+                img.append(image)
             
             # Pad label với 0 (blank token trong CTC vocab)
+            label = sample["word"]
+            label_len = len(label)
             tgt = np.concatenate(
                 (label, np.zeros(max_label_len - label_len, dtype=np.int32))
             )
             tgt_output.append(tgt)
             tgt_lengths.append(label_len)
         
+        # Now all images have same shape, safe to stack
         img = np.array(img, dtype=np.float32)
         tgt_output = np.array(tgt_output, dtype=np.int64)
         tgt_lengths = np.array(tgt_lengths, dtype=np.int32)

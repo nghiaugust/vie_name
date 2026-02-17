@@ -77,8 +77,7 @@ model_light = mobilenet_svtr_ctc_light(
 
 ```python
 # Sử dụng training script có sẵn
-python custom_vietocr/train_mobilenet_svtr_ctc.py \
-    --config custom_vietocr/config_mobilenet_svtr_ctc.yml
+python train_mobilenet_svtr_ctc.py --config config_mobilenet_svtr_ctc.yml
 
 # Hoặc resume từ checkpoint
 python custom_vietocr/train_mobilenet_svtr_ctc.py \

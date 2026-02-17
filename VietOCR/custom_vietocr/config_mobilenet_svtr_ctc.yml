@@ -3,11 +3,11 @@
 
 # Đường dẫn dataset
 dataset:
-  data_root: ./dataset/
+  data_root: ../dataset/
   train_annotation: train_annotation.txt  # File chứa đường dẫn ảnh và label
-  valid_annotation: valid_annotation.txt
-  train_folder: ./dataset/images/train/
-  valid_folder: ./dataset/images/valid/
+  valid_annotation: val_annotation.txt
+  train_folder: ../dataset/images/train/
+  valid_folder: ../dataset/images/valid/
 
 # Cấu hình vocab
 # CTC vocab: blank token tự động thêm vào index 0

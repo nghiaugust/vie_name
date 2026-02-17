@@ -261,11 +261,14 @@ class CTCTrainer:
         collate_fn = CollatorCTC()
         
         # DataLoaders
+        # Note: num_workers=0 on Windows to avoid LMDB pickle errors
+        num_workers = 0 if sys.platform == 'win32' else self.config.get('num_workers', 4)
+        
         train_loader = DataLoader(
             train_dataset,
             batch_size=train_config['batch_size'],
             shuffle=True,
-            num_workers=self.config.get('num_workers', 4),
+            num_workers=num_workers,
             collate_fn=collate_fn,
             pin_memory=True if self.device.type == 'cuda' else False
         )
@@ -274,7 +277,7 @@ class CTCTrainer:
             valid_dataset,
             batch_size=train_config.get('valid_batch_size', train_config['batch_size']),
             shuffle=False,
-            num_workers=self.config.get('num_workers', 4),
+            num_workers=num_workers,
             collate_fn=collate_fn,
             pin_memory=True if self.device.type == 'cuda' else False
         )
@@ -286,7 +289,9 @@ class CTCTrainer:
         log_dir = Path(self.config['logging']['log_dir'])
         log_dir.mkdir(parents=True, exist_ok=True)
         
-        logger = Logger(log_dir)
+        # Logger needs a file path, not a directory
+        log_file = log_dir / 'training.log'
+        logger = Logger(str(log_file))
         return logger
     
     def train_epoch(self):
