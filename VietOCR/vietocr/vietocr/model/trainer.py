@@ -153,6 +153,9 @@ class Trainer:
                 if acc_full_seq > best_acc:
                     self.save_weights(self.export_weights)
                     best_acc = acc_full_seq
+                    best_info = f"New best accuracy: {best_acc:.4f} at iteration {self.iter}"
+                    print(best_info)
+                    self.logger.log(best_info)
 
     def validate(self):
         self.model.eval()
@@ -330,7 +333,15 @@ class Trainer:
         path, _ = os.path.split(filename)
         os.makedirs(path, exist_ok=True)
 
+        # Lưu với iteration number để track
+        base, ext = os.path.splitext(filename)
+        filename_with_iter = f"{base}_iter{self.iter:06d}{ext}"
+        torch.save(self.model.state_dict(), filename_with_iter)
+        print(f"Saved best weights: {filename_with_iter}")
+        
+        # Lưu bản latest (overwrite) để dễ dùng
         torch.save(self.model.state_dict(), filename)
+        print(f"Updated latest weights: {filename}")
 
     def batch_to_device(self, batch):
         img = batch["img"].to(self.device, non_blocking=True)

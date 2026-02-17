@@ -1,0 +1,74 @@
+# Config ResNet50-Transformer - Nhẹ hơn VGG19, nhanh hơn ~1.5-2x
+# ResNet50 backbone với Transformer decoder
+
+# change to list chars of your dataset or use default vietnamese chars
+vocab: 'aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ0123456789!"#$%&''()*+,-./:;<=>?@[\]^_`{|}~ '
+
+# cpu, cuda, cuda:0
+device: cuda:0
+
+seq_modeling: transformer
+transformer:  
+    d_model: 256
+    nhead: 8
+    num_encoder_layers: 6
+    num_decoder_layers: 6
+    dim_feedforward: 2048
+    max_seq_length: 1024
+    pos_dropout: 0.1
+    trans_dropout: 0.1
+
+backbone: resnet50
+cnn:
+    ss:
+        - [2, 2]
+        - [2, 1]
+        - [2, 1]
+        - [2, 1]
+        - [1, 1]          
+    hidden: 256
+
+# Pretrained weights từ VietOCR (ResNet50-Transformer đã train sẵn trên OCR tiếng Việt)
+pretrain: https://drive.google.com/uc?id=12dTOZ9VP7ZVzwQgVvqBWz5JO5RXXW5NY
+
+optimizer:
+    max_lr: 0.0003 
+    pct_start: 0.1
+
+trainer:
+    batch_size: 32
+    print_every: 200
+    valid_every: 2000
+    iters: 100000
+    # where to save our model for prediction
+    export: ../weights/resnet_transformerocr.pth
+    checkpoint: ../checkpoint/resnet_transformerocr_checkpoint.pth
+    log: ../logs/resnet_train.log
+    # null to disable compuate accuracy, or change to number of sample to enable validiation while training
+    metrics: 500 # Tính accuracy trên 500 mẫu validation mỗi 2000 iterations
+
+dataset:    
+    # name of your dataset
+    name: vietnamese_names
+    # path to annotation and image
+    data_root: ../dataset/
+    train_annotation: train_annotation.txt
+    valid_annotation: val_annotation.txt
+    # resize image to 32 height, larger height will increase accuracy
+    image_height: 32
+    image_min_width: 32
+    image_max_width: 512
+
+dataloader:
+    num_workers: 0 # lỗi khi num_workers > 0
+    pin_memory: True
+
+aug:
+    image_aug: true
+    masked_language_model: true
+
+predictor:
+    # disable or enable beamsearch while prediction, use beamsearch will be slower
+    beamsearch: False
+
+quiet: False

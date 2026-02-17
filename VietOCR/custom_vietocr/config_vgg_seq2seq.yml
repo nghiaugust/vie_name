@@ -1,0 +1,81 @@
+# Config VGG19-Seq2Seq - Sequence to Sequence với Attention
+# Dùng encoder-decoder LSTM thay vì Transformer
+
+# change to list chars of your dataset or use default vietnamese chars
+vocab: 'aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ0123456789!"#$%&''()*+,-./:;<=>?@[\]^_`{|}~ '
+
+# cpu, cuda, cuda:0
+device: cuda:0
+
+seq_modeling: seq2seq
+transformer:
+    encoder_hidden: 256
+    decoder_hidden: 256
+    img_channel: 256
+    decoder_embedded: 256
+    dropout: 0.1
+
+backbone: vgg19_bn
+cnn:
+    pretrained: true
+    # pooling stride size
+    ss:
+        - [2, 2]
+        - [2, 2]
+        - [2, 1]
+        - [2, 1]
+        - [1, 1]         
+    # pooling kernel size 
+    ks:
+        - [2, 2]
+        - [2, 2]
+        - [2, 1]
+        - [2, 1]
+        - [1, 1]
+    # dim of ouput feature map
+    hidden: 256
+
+# Pretrained weights từ VietOCR (VGG-Seq2Seq đã train sẵn trên OCR tiếng Việt)
+pretrain: https://vocr.vn/data/vietocr/vgg_seq2seq.pth
+
+optimizer:
+    max_lr: 0.001
+    pct_start: 0.1
+
+trainer:
+    batch_size: 32
+    print_every: 200
+    valid_every: 2000
+    iters: 100000
+    # where to save our model for prediction
+    export: ../weights/seq2seq.pth
+    checkpoint: ../checkpoint/seq2seq_checkpoint.pth
+    log: ../logs/seq2seq_train.log
+    # null to disable compuate accuracy, or change to number of sample to enable validiation while training
+    metrics: 500 # Tính accuracy trên 500 mẫu validation mỗi 2000 iterations
+
+dataset:    
+    # name of your dataset
+    name: vietnamese_names
+    # path to annotation and image
+    data_root: ../dataset/
+    train_annotation: train_annotation.txt
+    valid_annotation: val_annotation.txt
+    # resize image to 32 height, larger height will increase accuracy
+    image_height: 32
+    image_min_width: 32
+    image_max_width: 512
+
+dataloader:
+    num_workers: 0 # lỗi khi num_workers > 0
+    pin_memory: True
+
+aug:
+    image_aug: true
+    masked_language_model: true
+
+predictor:
+    # disable or enable beamsearch while prediction, use beamsearch will be slower
+    beamsearch: False
+
+quiet: False
