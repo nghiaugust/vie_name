@@ -1,0 +1,5 @@
+# ResNet-Transformer
+python train_vietnamese_names.py --config config_resnet_transformer.yml
+
+# VGG-Seq2Seq  
+python train_vietnamese_names.py --config config_vgg_seq2seq.yml

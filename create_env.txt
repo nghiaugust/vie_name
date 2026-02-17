@@ -1,0 +1,15 @@
+--- tạo môi trường
+cd \vie_name\VietOCR
+python -m venv venv_vietocr
+
+.\venv_vietocr\Scripts\Activate.ps1
+
+--- cài cuda
+# Cài bản Nightly hỗ trợ CUDA 12.8 (Compute Capability 12.0)
+pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128
+
+--- Cài thêm dependencies cho VietOCR
+pip install einops pillow opencv-python gdown
+
+pip install pyyaml
+albumentations, prefetch_generator, lmdb, six, matplotlib
