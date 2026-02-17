@@ -11,7 +11,7 @@ def checkImageIsValid(imageBin):
     imgH = None
     imgW = None
 
-    imageBuf = np.fromstring(imageBin, dtype=np.uint8)
+    imageBuf = np.frombuffer(imageBin, dtype=np.uint8)
     try:
         img = cv2.imdecode(imageBuf, cv2.IMREAD_GRAYSCALE)
 
@@ -47,7 +47,8 @@ def createDataset(outputPath, root_dir, annotation_path):
         annotations = [l.strip().split("\t") for l in lines]
 
     nSamples = len(annotations)
-    env = lmdb.open(outputPath, map_size=1099511627776)
+    # Giảm map_size xuống 2GB thay vì 1TB để tránh lỗi không đủ dung lượng ổ đĩa
+    env = lmdb.open(outputPath, map_size=2*1024*1024*1024)  # 2GB
     cache = {}
     cnt = 0
     error = 0

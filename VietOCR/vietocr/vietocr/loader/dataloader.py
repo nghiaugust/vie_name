@@ -88,7 +88,7 @@ class OCRDataset(Dataset):
         key = "dim-%09d" % idx
 
         dim_img = self.txn.get(key.encode())
-        dim_img = np.fromstring(dim_img, dtype=np.int32)
+        dim_img = np.frombuffer(dim_img, dtype=np.int32)
         imgH, imgW = dim_img
 
         new_w, image_height = resize(
