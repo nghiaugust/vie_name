@@ -79,12 +79,9 @@ def check_dataset(config):
 
 def create_directories(config):
     """Tạo các thư mục cần thiết"""
-    save_dir = config['train']['save_dir']
-    log_dir = config['logging']['log_dir']
-    
-    for dir_path in [save_dir, log_dir]:
-        os.makedirs(dir_path, exist_ok=True)
-        print(f"✓ Directory ready: {dir_path}")
+    # Directories are now created automatically in CTCTrainer.__init__()
+    # This function is kept for backward compatibility but does nothing
+    pass
 
 
 class CTCTrainer:
@@ -143,6 +140,11 @@ class CTCTrainer:
         
         # Setup logger
         self.logger = self._build_logger()
+        
+        # Setup save directory - lưu vào VietOCR/weights/mobilenet_svtr_ctc
+        self.save_dir = BASE_DIR / 'weights' / 'mobilenet_svtr_ctc'
+        self.save_dir.mkdir(parents=True, exist_ok=True)
+        print(f"✓ Weights directory: {self.save_dir}")
         
         # Training state
         self.epoch = 0
@@ -286,12 +288,18 @@ class CTCTrainer:
     
     def _build_logger(self):
         """Build logger"""
-        log_dir = Path(self.config['logging']['log_dir'])
+        # Lưu log vào VietOCR/logs/
+        log_dir = BASE_DIR / 'logs'
         log_dir.mkdir(parents=True, exist_ok=True)
         
-        # Logger needs a file path, not a directory
-        log_file = log_dir / 'training.log'
+        # Tạo tên file log với timestamp để dễ phân biệt các lần training
+        import datetime
+        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        model_name = self.config['model']['name']
+        log_file = log_dir / f'{model_name}_{timestamp}.log'
+        
         logger = Logger(str(log_file))
+        print(f"✓ Log file: {log_file}")
         return logger
     
     def train_epoch(self):
@@ -490,9 +498,6 @@ class CTCTrainer:
     
     def save_checkpoint(self, name='checkpoint.pth'):
         """Save checkpoint"""
-        save_dir = Path(self.config['train']['save_dir'])
-        save_dir.mkdir(parents=True, exist_ok=True)
-        
         checkpoint = {
             'epoch': self.epoch,
             'model_state_dict': self.model.state_dict(),
@@ -510,13 +515,14 @@ class CTCTrainer:
         if self.use_amp and self.scaler is not None:
             checkpoint['scaler_state_dict'] = self.scaler.state_dict()
         
-        save_path = save_dir / name
+        save_path = self.save_dir / name
         torch.save(checkpoint, save_path)
         print(f"Saved checkpoint to {save_path}")
     
     def load_checkpoint(self, checkpoint_path):
         """Load checkpoint"""
-        checkpoint = torch.load(checkpoint_path, map_location=self.device)
+        # PyTorch 2.6+ requires weights_only=False for full checkpoints
+        checkpoint = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
         
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
@@ -534,6 +540,9 @@ class CTCTrainer:
             print("   ✓ AMP scaler state loaded")
         
         print(f"Loaded checkpoint from {checkpoint_path}")
+        print(f"   Resuming from epoch {self.epoch + 1}")
+        print(f"   Best Full Seq Acc so far: {self.best_full_seq_acc*100:.2f}%")
+        print(f"   Best Per Char Acc so far: {self.best_per_char_acc*100:.2f}%")
     
     def train(self):
         """Main training loop"""
@@ -548,6 +557,22 @@ class CTCTrainer:
         print(f"Device: {self.device}")
         print("Press Ctrl+C to stop and save checkpoint")
         print("=" * 70 + "\n")
+        
+        # Log training configuration
+        self.logger.log("=" * 70)
+        self.logger.log("MOBILENET-SVTR-CTC TRAINING LOG")
+        self.logger.log("=" * 70)
+        self.logger.log(f"Model: {self.config['model']['name']}")
+        self.logger.log(f"Vocabulary size: {self.config['vocab_size']}")
+        self.logger.log(f"Total epochs: {num_epochs}")
+        self.logger.log(f"Batch size: {self.config['train']['batch_size']}")
+        self.logger.log(f"Learning rate: {self.config['train']['learning_rate']}")
+        self.logger.log(f"Optimizer: {self.config['train']['optimizer']}")
+        self.logger.log(f"Device: {self.device}")
+        self.logger.log(f"AMP enabled: {self.use_amp}")
+        self.logger.log(f"Train samples: {len(self.train_loader.dataset):,}")
+        self.logger.log(f"Valid samples: {len(self.valid_loader.dataset):,}")
+        self.logger.log("=" * 70 + "\n")
         
         try:
             for epoch in range(self.epoch, num_epochs):
@@ -579,17 +604,28 @@ class CTCTrainer:
                 print(f"Valid Loss: {valid_loss:.4f}")
                 print(f"Accuracy - Full Seq: {full_seq_acc*100:.2f}% | Per Char: {per_char_acc*100:.2f}%")
                 
-                # Save best model
-                if valid_loss < self.best_valid_loss:
+                # Log to file
+                self.logger.log(f"\nEpoch {epoch+1}/{num_epochs}:")
+                self.logger.log(f"  Time: {epoch_time:.1f}s")
+                self.logger.log(f"  Learning Rate: {lr:.6f}")
+                self.logger.log(f"  Train Loss: {train_loss:.4f}")
+                self.logger.log(f"  Valid Loss: {valid_loss:.4f}")
+                self.logger.log(f"  Full Sequence Acc: {full_seq_acc*100:.2f}%")
+                self.logger.log(f"  Per Character Acc: {per_char_acc*100:.2f}%")
+                
+                # Save best model - based on Full Sequence Accuracy
+                if full_seq_acc > self.best_full_seq_acc:
                     self.best_valid_loss = valid_loss
                     self.best_full_seq_acc = full_seq_acc
                     self.best_per_char_acc = per_char_acc
                     self.save_checkpoint('best_model.pth')
                     self.patience_counter = 0
-                    print("✓ New best model saved!")
+                    print(f"✓ New best model saved! (Full Seq Acc: {full_seq_acc*100:.2f}%)")
+                    self.logger.log(f"  ✓ New best model saved! (Full Seq Acc: {full_seq_acc*100:.2f}%)")
                 else:
                     self.patience_counter += 1
-                    print(f"  Patience: {self.patience_counter}/{patience}")
+                    print(f"  Patience: {self.patience_counter}/{patience} (Best: {self.best_full_seq_acc*100:.2f}%)")
+                    self.logger.log(f"  Patience: {self.patience_counter}/{patience} (Best: {self.best_full_seq_acc*100:.2f}%)")
                 
                 # Save periodic checkpoint
                 if (epoch + 1) % self.config['train']['save_interval'] == 0:
@@ -600,6 +636,7 @@ class CTCTrainer:
                 # Early stopping
                 if self.patience_counter >= patience:
                     print(f"\n⏸️  Early stopping at epoch {epoch+1}")
+                    self.logger.log(f"\n⏸️  Early stopping at epoch {epoch+1}")
                     break
             
             print("\n" + "=" * 70)
@@ -608,14 +645,32 @@ class CTCTrainer:
             print(f"Best validation loss: {self.best_valid_loss:.4f}")
             print(f"Best Full Sequence Accuracy: {self.best_full_seq_acc*100:.2f}%")
             print(f"Best Per Character Accuracy: {self.best_per_char_acc*100:.2f}%")
-            print(f"Best model saved at: {Path(self.config['train']['save_dir']) / 'best_model.pth'}")
+            print(f"Best model saved at: {self.save_dir / 'best_model.pth'}")
+            
+            # Log final results
+            self.logger.log("\n" + "=" * 70)
+            self.logger.log("✓ TRAINING COMPLETED")
+            self.logger.log("=" * 70)
+            self.logger.log(f"Best validation loss: {self.best_valid_loss:.4f}")
+            self.logger.log(f"Best Full Sequence Accuracy: {self.best_full_seq_acc*100:.2f}%")
+            self.logger.log(f"Best Per Character Accuracy: {self.best_per_char_acc*100:.2f}%")
+            self.logger.log(f"Best model saved at: {self.save_dir / 'best_model.pth'}")
+            self.logger.close()
             
         except KeyboardInterrupt:
             print("\n\n⏸️  Training interrupted by user")
             print("💾 Saving checkpoint...")
             self.save_checkpoint('interrupted_checkpoint.pth')
             print("✓ Checkpoint saved")
-            print(f"✓ Best model: {Path(self.config['train']['save_dir']) / 'best_model.pth'}")
+            print(f"✓ Best model: {self.save_dir / 'best_model.pth'}")
+            
+            # Log interruption
+            self.logger.log("\n⏸️  Training interrupted by user")
+            self.logger.log(f"Last epoch: {self.epoch+1}")
+            self.logger.log(f"Best valid loss so far: {self.best_valid_loss:.4f}")
+            self.logger.log(f"Best Full Seq Acc: {self.best_full_seq_acc*100:.2f}%")
+            self.logger.log(f"Best Per Char Acc: {self.best_per_char_acc*100:.2f}%")
+            self.logger.close()
             
         except Exception as e:
             print(f"\n❌ Error during training: {e}")
@@ -623,6 +678,11 @@ class CTCTrainer:
             traceback.print_exc()
             print("\n💾 Saving emergency checkpoint...")
             self.save_checkpoint('error_checkpoint.pth')
+            
+            # Log error
+            self.logger.log(f"\n❌ Error during training: {e}")
+            self.logger.log(traceback.format_exc())
+            self.logger.close()
             raise
 
 

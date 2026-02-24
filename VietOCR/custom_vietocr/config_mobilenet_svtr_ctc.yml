@@ -1,13 +1,15 @@
 # Configuration cho MobileNet-SVTR-CTC Model
 # Kiến trúc tối ưu cho nhận diện tên tiếng Việt
+# 
+# Paths được hardcode:
+#   - Weights: VietOCR/weights/mobilenet_svtr_ctc/
+#   - Logs: VietOCR/logs/
 
 # Đường dẫn dataset
 dataset:
-  data_root: ../dataset/
+  data_root: ../dataset/  # Relative to VietOCR/custom_vietocr/
   train_annotation: train_annotation.txt  # File chứa đường dẫn ảnh và label
   valid_annotation: val_annotation.txt
-  train_folder: ../dataset/images/train/
-  valid_folder: ../dataset/images/valid/
 
 # Cấu hình vocab
 # CTC vocab: blank token tự động thêm vào index 0
@@ -38,8 +40,8 @@ model:
 
 # Cấu hình training
 train:
-  batch_size: 64  # Batch size (có thể tăng lên 64-128 nếu GPU đủ mạnh)
-  epochs: 100
+  batch_size: 128  # Batch size (có thể tăng lên 64-128 nếu GPU đủ mạnh)
+  epochs: 200
   
   # Image size
   image_height: 32  # Chiều cao ảnh input
@@ -51,8 +53,7 @@ train:
   weight_decay: 0.00001
   
   # Learning rate scheduler
-  scheduler: 'cosine'  # cosine annealing
-  warmup_epochs: 5  # Số epochs warmup
+  scheduler: 'cosine'  # cosine annealing (options: 'cosine', 'step', 'reduce')
   min_lr: 0.00001  # Learning rate tối thiểu
   
   # AMP (Automatic Mixed Precision) - Tăng tốc training, giảm memory
@@ -62,29 +63,32 @@ train:
   blank_idx: 0  # Index của blank token trong vocab
   
   # Early stopping
-  patience: 15  # Dừng sớm nếu không improve sau 15 epochs
+  patience: 20  # Dừng sớm nếu không improve sau 15 epochs
   
   # Checkpoint
-  save_dir: ./weights/mobilenet_svtr_ctc/
+  # Note: save_dir được hardcode trong train script: VietOCR/weights/mobilenet_svtr_ctc/
   save_interval: 5  # Lưu checkpoint mỗi 5 epochs
+  valid_batch_size: 64  # Batch size cho validation
 
 # Cấu hình validation
+# Metrics:
+#   - Full Sequence Accuracy: Cả câu phải khớp 100%
+#   - Per Character Accuracy: Tính theo từng ký tự
 validation:
-  batch_size: 64  # Batch lớn hơn cho validation
   metrics:
-    - 'accuracy'  # Character-level accuracy
-    - 'cer'  # Character Error Rate
-    - 'wer'  # Word Error Rate
+    - 'full_sequence'  # Full sequence accuracy
+    - 'per_char'  # Per character accuracy
   
 # Cấu hình device
 device: 'cuda'  # 'cuda' hoặc 'cpu'
-num_workers: 4  # Số workers cho DataLoader
+num_workers: 0  # Số workers cho DataLoader (Windows: 0, Linux: 4-8)
 
 # Logging
+# Note: Log directory được hardcode trong train script: VietOCR/logs/
+# File log: mobilenet_svtr_ctc_YYYYMMDD_HHMMSS.log
 logging:
   log_interval: 100  # Log mỗi 100 iterations
-  tensorboard: true  # Sử dụng tensorboard
-  log_dir: ./logs/mobilenet_svtr_ctc/
+  tensorboard: false  # Tensorboard hiện chưa implement
 
 # ===== LIGHT VERSION CONFIG =====
 # Uncomment dưới đây nếu muốn dùng phiên bản light (nhanh hơn, nhẹ hơn)
