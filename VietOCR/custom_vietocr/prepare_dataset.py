@@ -1,6 +1,6 @@
 """
 Script chuẩn bị dataset cho training VietOCR
-Chia dataset thành train/validation (90/10)
+Chia dataset thành train/validation/test (80/10/10)
 """
 
 import os
@@ -11,17 +11,21 @@ def split_dataset(
     input_annotation_file,
     output_train_file,
     output_val_file,
-    train_ratio=0.9,
+    output_test_file,
+    train_ratio=0.8,
+    val_ratio=0.1,
     seed=42
 ):
     """
-    Chia dataset thành train và validation
+    Chia dataset thành train, validation và test
     
     Args:
         input_annotation_file: File annotation gốc
         output_train_file: File annotation cho training
         output_val_file: File annotation cho validation
-        train_ratio: Tỷ lệ dữ liệu training (0.9 = 90%)
+        output_test_file: File annotation cho test
+        train_ratio: Tỷ lệ dữ liệu training (0.8 = 80%)
+        val_ratio: Tỷ lệ dữ liệu validation (0.1 = 10%)
         seed: Random seed để reproducible
     """
     print(f"Đang đọc file annotation: {input_annotation_file}")
@@ -52,15 +56,18 @@ def split_dataset(
     random.seed(seed)
     random.shuffle(lines)
     
-    # Tính số lượng train/val
+    # Tính số lượng train/val/test
     num_train = int(len(lines) * train_ratio)
-    num_val = len(lines) - num_train
+    num_val = int(len(lines) * val_ratio)
+    num_test = len(lines) - num_train - num_val
     
     train_lines = lines[:num_train]
-    val_lines = lines[num_train:]
+    val_lines = lines[num_train:num_train + num_val]
+    test_lines = lines[num_train + num_val:]
     
-    print(f"Số mẫu training: {num_train}")
-    print(f"Số mẫu validation: {num_val}")
+    print(f"Số mẫu training: {num_train} ({num_train/len(lines)*100:.1f}%)")
+    print(f"Số mẫu validation: {num_val} ({num_val/len(lines)*100:.1f}%)")
+    print(f"Số mẫu test: {num_test} ({num_test/len(lines)*100:.1f}%)")
     
     # Tạo thư mục output nếu chưa có
     os.makedirs(os.path.dirname(output_train_file), exist_ok=True)
@@ -75,6 +82,11 @@ def split_dataset(
     with open(output_val_file, 'w', encoding='utf-8') as f:
         f.writelines(val_lines)
     print(f"✓ Đã tạo file validation: {output_val_file}")
+    
+    # Ghi file test
+    with open(output_test_file, 'w', encoding='utf-8') as f:
+        f.writelines(test_lines)
+    print(f"✓ Đã tạo file test: {output_test_file}")
 
 
 def verify_dataset(annotation_file, data_root, max_check=100):
@@ -167,6 +179,7 @@ if __name__ == "__main__":
     INPUT_ANNOTATION = DATA_ROOT / "label.txt"
     OUTPUT_TRAIN = DATA_ROOT / "train_annotation.txt"
     OUTPUT_VAL = DATA_ROOT / "val_annotation.txt"
+    OUTPUT_TEST = DATA_ROOT / "test_annotation.txt"
     
     print("=" * 60)
     print("CHUẨN BỊ DATASET CHO TRAINING VIETOCR")
@@ -184,7 +197,9 @@ if __name__ == "__main__":
         input_annotation_file=str(INPUT_ANNOTATION),
         output_train_file=str(OUTPUT_TRAIN),
         output_val_file=str(OUTPUT_VAL),
-        train_ratio=0.9,
+        output_test_file=str(OUTPUT_TEST),
+        train_ratio=0.8,
+        val_ratio=0.1,
         seed=42
     )
     
@@ -195,9 +210,13 @@ if __name__ == "__main__":
     print("\nKiểm tra file validation:")
     verify_dataset(str(OUTPUT_VAL), str(DATA_ROOT), max_check=100)
     
+    print("\nKiểm tra file test:")
+    verify_dataset(str(OUTPUT_TEST), str(DATA_ROOT), max_check=100)
+    
     print("\n" + "=" * 60)
     print("✓ HOÀN TẤT CHUẨN BỊ DATASET")
     print("=" * 60)
     print(f"\nFile training: {OUTPUT_TRAIN}")
     print(f"File validation: {OUTPUT_VAL}")
+    print(f"File test: {OUTPUT_TEST}")
     print("\nBạn có thể bắt đầu training ngay!")
