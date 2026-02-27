@@ -29,7 +29,7 @@ ENV/
 *.pth
 *.pt
 *.ckpt
-!weights/best/*.pth
+# !weights/best/*.pth
 
 # Logs
 *.log
