@@ -6,6 +6,8 @@ custom_vietocr/train_vietnamese_names/
 custom_vietocr/valid_vietnamese_names/
 test/
 
+readme_backup.md
+
 # Python cache
 __pycache__/
 *.py[cod]
@@ -27,6 +29,7 @@ ENV/
 *.pth
 *.pt
 *.ckpt
+!weights/best/*.pth
 
 # Logs
 *.log

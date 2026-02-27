@@ -1,0 +1,406 @@
+======================================================================
+KẾT QUẢ ĐÁNH GIÁ 5 MÔ HÌNH OCR
+======================================================================
+
+Dataset: test_annotation.txt
+Tổng số mẫu: 14597
+Batch size: 1 (sequential processing)
+Device: cuda:0
+
+======================================================================
+BẢNG TỔNG QUAN
+======================================================================
+
+Model                                    Exact      Word       Char       Time(ms)
+----------------------------------------------------------------------
+VGG Transformer (Pretrained VietOCR)     64.43%    83.00%    93.43%    116.41
+VGG Seq2Seq (Pretrained VietOCR)         54.09%    76.19%    88.40%     15.87
+VGG Transformer (Fine-tuned)             99.21%    99.73%    99.91%    116.36
+VGG Seq2Seq (Fine-tuned)                 99.52%    99.82%    99.94%     16.41
+MobileNet-SVTR-CTC (Fine-tuned)          98.65%    99.51%    99.83%      5.42
+
+
+======================================================================
+CHI TIẾT TỪNG MÔ HÌNH
+======================================================================
+
+----------------------------------------------------------------------
+VGG Transformer (Pretrained VietOCR)
+----------------------------------------------------------------------
+Tổng số mẫu: 14597
+
+Kết quả:
+  - Exact Match Accuracy:    64.43% (9405/14597)
+  - Word-level Accuracy:     83.00%
+  - Character-level Accuracy: 93.43%
+  - Thời gian xử lý:          1699.28s
+  - Tốc độ trung bình:        116.41ms/ảnh
+
+Số lỗi: 5192
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 15700.jpg
+     Label: Hồ Tú Diễm
+     Pred:  Hồ Tù Diễm
+     Word Acc: 66.7% | Char Acc: 90.0%
+
+  2. 38258.jpg
+     Label: Triệu Thùy Ngọc
+     Pred:  TRIỆU THẤY NGƯỜI
+     Word Acc: 0.0% | Char Acc: 26.7%
+
+  3. 125688.jpg
+     Label: Nông Xuân Trường Nhân
+     Pred:  NGUYỄN THỊ THUYỀN THỊ THUẬN
+     Word Acc: 0.0% | Char Acc: 0.0%
+
+  4. 125072.jpg
+     Label: Ông Thị Phương Lan
+     Pred:  0ng Viên Pusong Lan
+     Word Acc: 25.0% | Char Acc: 55.6%
+
+  5. 93002.jpg
+     Label: Thẩm Mộng Khuyên
+     Pred:  Thẩm Mông Khuyên
+     Word Acc: 66.7% | Char Acc: 93.8%
+
+  6. 77058.jpg
+     Label: Lương Ánh Minh
+     Pred:  Lương Anh Minh
+     Word Acc: 66.7% | Char Acc: 92.9%
+
+  7. 101334.jpg
+     Label: Giáp Thục Thương
+     Pred:  Giáp Thực Thương
+     Word Acc: 66.7% | Char Acc: 93.8%
+
+  8. 64322.jpg
+     Label: Quách Anh Anh
+     Pred:  Quách Anh Nên
+     Word Acc: 66.7% | Char Acc: 76.9%
+
+  9. 109000.jpg
+     Label: Đậu Cẩm Bền
+     Pred:  Đậu Cầm Bền
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  10. 121452.jpg
+     Label: Bùi Thanh Trúc Quỳnh
+     Pred:  Bởi Thuận Triệc Ngày Thị Thuận
+     Word Acc: 0.0% | Char Acc: 5.0%
+
+----------------------------------------------------------------------
+VGG Seq2Seq (Pretrained VietOCR)
+----------------------------------------------------------------------
+Tổng số mẫu: 14597
+
+Kết quả:
+  - Exact Match Accuracy:    54.09% (7895/14597)
+  - Word-level Accuracy:     76.19%
+  - Character-level Accuracy: 88.40%
+  - Thời gian xử lý:          231.62s
+  - Tốc độ trung bình:        15.87ms/ảnh
+
+Số lỗi: 6702
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 6329.jpg
+     Label: Vương Đức Tuấn
+     Pred:  Vương Đức Tuần
+     Word Acc: 66.7% | Char Acc: 92.9%
+
+  2. 15700.jpg
+     Label: Hồ Tú Diễm
+     Pred:  Hộ Tủ Diễm
+     Word Acc: 33.3% | Char Acc: 80.0%
+
+  3. 38258.jpg
+     Label: Triệu Thùy Ngọc
+     Pred:  00000000001119
+     Word Acc: 0.0% | Char Acc: 0.0%
+
+  4. 26556.jpg
+     Label: Nông Hương Kim
+     Pred:  Người Nông Hương Kim
+     Word Acc: 66.7% | Char Acc: 57.1%
+
+  5. 81355.jpg
+     Label: Đỗ Huy Long
+     Pred:  Đỏ Huy Long
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  6. 86889.jpg
+     Label: Quách Quang Trí
+     Pred:  Quách Quang Tri
+     Word Acc: 66.7% | Char Acc: 93.3%
+
+  7. 92402.jpg
+     Label: Tiêu Băng Nguyệt
+     Pred:  Tiêu Băng Nguyên
+     Word Acc: 66.7% | Char Acc: 87.5%
+
+  8. 125688.jpg
+     Label: Nông Xuân Trường Nhân
+     Pred:  00000000001000000
+     Word Acc: 0.0% | Char Acc: 0.0%
+
+  9. 125072.jpg
+     Label: Ông Thị Phương Lan
+     Pred:  0012000000001
+     Word Acc: 0.0% | Char Acc: 0.0%
+
+  10. 93002.jpg
+     Label: Thẩm Mộng Khuyên
+     Pred:  Thầm Mộng Khuyên
+     Word Acc: 66.7% | Char Acc: 93.8%
+
+----------------------------------------------------------------------
+VGG Transformer (Fine-tuned)
+----------------------------------------------------------------------
+Tổng số mẫu: 14597
+
+Kết quả:
+  - Exact Match Accuracy:    99.21% (14482/14597)
+  - Word-level Accuracy:     99.73%
+  - Character-level Accuracy: 99.91%
+  - Thời gian xử lý:          1698.49s
+  - Tốc độ trung bình:        116.36ms/ảnh
+
+Số lỗi: 115
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 35377.jpg
+     Label: Tô Tuấn Minh
+     Pred:  Bì Tuấn Minh
+     Word Acc: 66.7% | Char Acc: 83.3%
+
+  2. 6364.jpg
+     Label: Võ Thị Ngọc Nhơn
+     Pred:  Võ Thị Ngọc Nhơm
+     Word Acc: 75.0% | Char Acc: 93.8%
+
+  3. 99658.jpg
+     Label: Khổng Bảo Bông
+     Pred:  Khổng Bảo Đông
+     Word Acc: 66.7% | Char Acc: 92.9%
+
+  4. 100788.jpg
+     Label: Cái Nhã Mơ
+     Pred:  Cái Nhã Mọ
+     Word Acc: 66.7% | Char Acc: 90.0%
+
+  5. 6018.jpg
+     Label: Tưởng Ngọc Quốc Bình
+     Pred:  Tường Ngọc Quốc Bình
+     Word Acc: 75.0% | Char Acc: 95.0%
+
+  6. 97863.jpg
+     Label: Tiêu Sỹ Chinh
+     Pred:  Tiêu Sỹ Chính
+     Word Acc: 66.7% | Char Acc: 92.3%
+
+  7. 6321.jpg
+     Label: Phạm Qúy Tâm
+     Pred:  Phạm Quy Tâm
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  8. 127467.jpg
+     Label: Thạch Thị Bích Uyên
+     Pred:  Nông Tân Như Huyền
+     Word Acc: 0.0% | Char Acc: 26.3%
+
+  9. 59196.jpg
+     Label: Hoàng Thùy Hà
+     Pred:  Hoàng Thùy Hải
+     Word Acc: 66.7% | Char Acc: 84.6%
+
+  10. 22662.jpg
+     Label: Lương Linh Nghi
+     Pred:  Khương Linh Nghi
+     Word Acc: 66.7% | Char Acc: 86.7%
+
+----------------------------------------------------------------------
+VGG Seq2Seq (Fine-tuned)
+----------------------------------------------------------------------
+Tổng số mẫu: 14597
+
+Kết quả:
+  - Exact Match Accuracy:    99.52% (14527/14597)
+  - Word-level Accuracy:     99.82%
+  - Character-level Accuracy: 99.94%
+  - Thời gian xử lý:          239.52s
+  - Tốc độ trung bình:        16.41ms/ảnh
+
+Số lỗi: 70
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 35377.jpg
+     Label: Tô Tuấn Minh
+     Pred:  Đỗ Tuấn Minh
+     Word Acc: 66.7% | Char Acc: 83.3%
+
+  2. 2584.jpg
+     Label: Y Huyết Niê
+     Pred:  Y Huyết Nhê
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  3. 6321.jpg
+     Label: Phạm Qúy Tâm
+     Pred:  Phạm Quy Tâm
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  4. 127467.jpg
+     Label: Thạch Thị Bích Uyên
+     Pred:  Trần Thịnh Huyền
+     Word Acc: 0.0% | Char Acc: 42.1%
+
+  5. 1656.jpg
+     Label: Nguyeãn Thò UÙt
+     Pred:  Nguyeãn Thò Uất
+     Word Acc: 66.7% | Char Acc: 93.3%
+
+  6. 124542.jpg
+     Label: Võ Minh Nhật Giang
+     Pred:  Lê Minh Nhật Giang
+     Word Acc: 75.0% | Char Acc: 88.9%
+
+  7. 1548.jpg
+     Label: Nguyeãn Vaên Myõ
+     Pred:  Nguyeãn Vaên My
+     Word Acc: 66.7% | Char Acc: 93.8%
+
+  8. 128067.jpg
+     Label: Cung Ngọc Khánh Bảo
+     Pred:  Lương Ngọc Khánh Bảo
+     Word Acc: 75.0% | Char Acc: 84.2%
+
+  9. 130447.jpg
+     Label: Kiều Bá Thiên Danh
+     Pred:  Thân Hà Thiên Danh
+     Word Acc: 50.0% | Char Acc: 66.7%
+
+  10. 1777.jpg
+     Label: Lường Thị Hoa
+     Pred:  Lương Thị Hoa
+     Word Acc: 66.7% | Char Acc: 92.3%
+
+----------------------------------------------------------------------
+MobileNet-SVTR-CTC (Fine-tuned)
+----------------------------------------------------------------------
+Tổng số mẫu: 14597
+
+Kết quả:
+  - Exact Match Accuracy:    98.65% (14400/14597)
+  - Word-level Accuracy:     99.51%
+  - Character-level Accuracy: 99.83%
+  - Thời gian xử lý:          79.09s
+  - Tốc độ trung bình:        5.42ms/ảnh
+
+Số lỗi: 197
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 4294.jpg
+     Label: Đào Thị Kiều Diễm
+     Pred:  Đào Thị Kều Diễm
+     Word Acc: 75.0% | Char Acc: 94.1%
+
+  2. 35377.jpg
+     Label: Tô Tuấn Minh
+     Pred:  Tr Tuấn Minh
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  3. 6018.jpg
+     Label: Tưởng Ngọc Quốc Bình
+     Pred:  Tướng Ngọc Quốc Bình
+     Word Acc: 75.0% | Char Acc: 95.0%
+
+  4. 39769.jpg
+     Label: Bùi Yến Nga
+     Pred:  Bùi Yến Ngọ
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  5. 2584.jpg
+     Label: Y Huyết Niê
+     Pred:  Y Quyết Nê
+     Word Acc: 33.3% | Char Acc: 81.8%
+
+  6. 6321.jpg
+     Label: Phạm Qúy Tâm
+     Pred:  Phạm Qùy Tâm
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  7. 109740.jpg
+     Label: Lã Lệ Yên
+     Pred:  Lã Lệ Vên
+     Word Acc: 66.7% | Char Acc: 88.9%
+
+  8. 127467.jpg
+     Label: Thạch Thị Bích Uyên
+     Pred:  Bàu ị HThỳih Uyệp
+     Word Acc: 0.0% | Char Acc: 31.6%
+
+  9. 118167.jpg
+     Label: Mã Tiến Khôi
+     Pred:  Mã Tiểu Khôi
+     Word Acc: 66.7% | Char Acc: 83.3%
+
+  10. 22662.jpg
+     Label: Lương Linh Nghi
+     Pred:  Khương Linh Nghi
+     Word Acc: 66.7% | Char Acc: 86.7%
+
+
+======================================================================
+SO SÁNH CÁC MÔ HÌNH
+======================================================================
+
+Xếp hạng theo Exact Match Accuracy:
+  1. VGG Seq2Seq (Fine-tuned)                  99.52%
+  2. VGG Transformer (Fine-tuned)              99.21%
+  3. MobileNet-SVTR-CTC (Fine-tuned)           98.65%
+  4. VGG Transformer (Pretrained VietOCR)      64.43%
+  5. VGG Seq2Seq (Pretrained VietOCR)          54.09%
+
+Xếp hạng theo Word-level Accuracy:
+  1. VGG Seq2Seq (Fine-tuned)                  99.82%
+  2. VGG Transformer (Fine-tuned)              99.73%
+  3. MobileNet-SVTR-CTC (Fine-tuned)           99.51%
+  4. VGG Transformer (Pretrained VietOCR)      83.00%
+  5. VGG Seq2Seq (Pretrained VietOCR)          76.19%
+
+Xếp hạng theo Character-level Accuracy:
+  1. VGG Seq2Seq (Fine-tuned)                  99.94%
+  2. VGG Transformer (Fine-tuned)              99.91%
+  3. MobileNet-SVTR-CTC (Fine-tuned)           99.83%
+  4. VGG Transformer (Pretrained VietOCR)      93.43%
+  5. VGG Seq2Seq (Pretrained VietOCR)          88.40%
+
+Xếp hạng theo Tốc độ (nhanh nhất):
+  1. MobileNet-SVTR-CTC (Fine-tuned)            5.42ms/ảnh
+  2. VGG Seq2Seq (Pretrained VietOCR)          15.87ms/ảnh
+  3. VGG Seq2Seq (Fine-tuned)                  16.41ms/ảnh
+  4. VGG Transformer (Fine-tuned)             116.36ms/ảnh
+  5. VGG Transformer (Pretrained VietOCR)     116.41ms/ảnh
+
+======================================================================
+KẾT LUẬN
+======================================================================
+
+Mô hình chính xác nhất (Exact Match): VGG Seq2Seq (Fine-tuned)
+  - Exact Match Accuracy: 99.52%
+  - Word-level Accuracy: 99.82%
+  - Character-level Accuracy: 99.94%
+  - Tốc độ: 16.41ms/ảnh
+
+Mô hình nhanh nhất: MobileNet-SVTR-CTC (Fine-tuned)
+  - Tốc độ: 5.42ms/ảnh
+  - Exact Match Accuracy: 98.65%
+  - Word-level Accuracy: 99.51%
+  - Character-level Accuracy: 99.83%
+
+======================================================================
