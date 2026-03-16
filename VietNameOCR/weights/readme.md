@@ -1,0 +1,1 @@
+mobilenet_svtr_ctc.pth (55.9mb)
