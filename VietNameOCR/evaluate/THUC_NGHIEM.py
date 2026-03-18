@@ -1,12 +1,18 @@
 import os
 import sys
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 from predict import VietNameOCR
 
 def main():
     # 1. Khai báo đường dẫn đến cấu hình và trọng số
     # (Đường dẫn tương đối so với vị trí file THUC_NGHIEM.py)
-    config_path = 'config_mobilenet_svtr_ctc.yml'
-    weights_path = 'weights/mobilenet_svtr_ctc.pth'
+    config_path = '../config_mobilenet_svtr_ctc.yml'
+    weights_path = '../weights/mobilenet_svtr_ctc.pth'
     
     # Đường dẫn ảnh test (bạn có thể thay bằng đường dẫn ảnh thực tế của bạn)
     image_path = '1.jpg'
