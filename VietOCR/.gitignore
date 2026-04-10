@@ -39,3 +39,4 @@ logs/
 .DS_Store
 Thumbs.db
 
+evaluate/evaluate_test/image_name/

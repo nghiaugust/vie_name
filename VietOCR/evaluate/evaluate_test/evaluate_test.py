@@ -173,34 +173,34 @@ def calculate_metrics(pred, label):
     return exact_match, word_acc, char_acc
 
 
-def load_dataset(dataset_dir, annotation_file):
-    """
-    Đọc dataset từ file test_annotation.txt với format: images/filename.jpg\tlabel
-    Returns:
-        samples: list of (img_path, label)
-    """
+def load_annotations(annotation_path):
+    """Đọc file annotation.txt, danh sách tên (dòng 1 -> dòng N)"""
+    labels = {}
+    with open(annotation_path, 'r', encoding='utf-8') as f:
+        for idx, line in enumerate(f, start=1):
+            name = line.strip()
+            if name:
+                labels[idx] = name
+    return labels
+
+
+def get_image_samples(image_dir, labels):
+    """Lấy danh sách các ảnh và nối nhãn dựa vào ID đuôi (VD: *_*_X.jpg -> dòng X)"""
     samples = []
+    valid_extensions = {'.jpg', '.jpeg', '.png'}
     
-    with open(annotation_file, 'r', encoding='utf-8') as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            
-            parts = line.split('\t')
-            if len(parts) >= 2:
-                # Path trong file: images/117535.jpg
-                relative_path = parts[0]
-                label = parts[1]
-                
-                # Tạo đường dẫn đầy đủ: dataset_dir/images/filename.jpg
-                img_path = dataset_dir / relative_path
-                
-                if img_path.exists():
-                    samples.append((img_path, label))
+    for entry in image_dir.iterdir():
+        if entry.is_file() and entry.suffix.lower() in valid_extensions:
+            parts = entry.stem.split('_')
+            try:
+                line_idx = int(parts[-1])
+                if line_idx in labels:
+                    samples.append((entry, labels[line_idx]))
                 else:
-                    print(f"⚠️  Không tìm thấy: {img_path}")
-    
+                    print(f"⚠️  File {entry.name}: Không có dòng {line_idx} trong annotation.txt")
+            except ValueError:
+                print(f"⚠️  File {entry.name}: Không parse được số thứ tự dòng.")
+                
     return samples
 
 
@@ -281,18 +281,30 @@ def evaluate_model(model_name, predictor, samples):
 
 def main():
     # Cấu hình dataset
-    dataset_dir = Path(__file__).parent.parent.parent / "dataset"
-    annotation_file = dataset_dir / "test_annotation.txt"
-    output_file = Path(__file__).parent / "ket_qua_danh_gia_test.txt"
+    current_dir = Path(__file__).parent
+    image_dir = current_dir / "image_name"
+    annotation_file = image_dir / "annotation.txt"
+    output_file = current_dir / "ket_qua_danh_gia_test.txt"
     
     print("=" * 70)
     print("ĐÁNH GIÁ 5 MÔ HÌNH OCR")
     print("=" * 70)
     
     # Đọc dataset
-    print("\n📖 Đang đọc bộ test từ test_annotation.txt...")
-    samples = load_dataset(dataset_dir, annotation_file)
-    print(f"✓ Sử dụng toàn bộ: {len(samples)} mẫu từ test_annotation.txt")
+    print("\n📖 Đang đọc bộ test từ image_name...")
+    if not annotation_file.exists():
+        print(f"Không tìm thấy file annotation tại: {annotation_file}")
+        sys.exit(1)
+        
+    labels_dict = load_annotations(annotation_file)
+    print(f"✓ Đã load {len(labels_dict)} tên từ annotation.txt.")
+    
+    samples = get_image_samples(image_dir, labels_dict)
+    print(f"✓ Tìm thấy {len(samples)} ảnh hợp lệ cần đánh giá.")
+    
+    if not samples:
+        print("Vòng duyệt dataset trống. Dừng đánh giá.")
+        sys.exit(0)
     
     # Cấu hình 5 models
     models_config = [

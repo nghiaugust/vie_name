@@ -1,0 +1,351 @@
+======================================================================
+KẾT QUẢ ĐÁNH GIÁ 5 MÔ HÌNH OCR
+======================================================================
+
+Dataset: D:\nghia_ct6\vie_name\VietOCR\evaluate\evaluate_test\image_name\annotation.txt
+Tổng số mẫu: 1500
+Batch size: 1 (sequential processing)
+Device: cuda:0
+
+======================================================================
+BẢNG TỔNG QUAN
+======================================================================
+
+Model                                    Exact      Word       Char       Time(ms)
+----------------------------------------------------------------------
+VGG Transformer (Pretrained VietOCR)     85.33%    93.13%    95.98%    125.91
+VGG Seq2Seq (Pretrained VietOCR)         73.27%    86.45%    92.00%     23.41
+VGG Transformer (Fine-tuned)             99.60%    99.87%    99.97%    120.27
+VGG Seq2Seq (Fine-tuned)                 99.80%    99.93%    99.98%     17.71
+MobileNet-SVTR-CTC (Fine-tuned)          44.13%    72.38%    91.42%      6.60
+
+
+======================================================================
+CHI TIẾT TỪNG MÔ HÌNH
+======================================================================
+
+----------------------------------------------------------------------
+VGG Transformer (Pretrained VietOCR)
+----------------------------------------------------------------------
+Tổng số mẫu: 1500
+
+Kết quả:
+  - Exact Match Accuracy:    85.33% (1280/1500)
+  - Word-level Accuracy:     93.13%
+  - Character-level Accuracy: 95.98%
+  - Thời gian xử lý:          188.87s
+  - Tốc độ trung bình:        125.91ms/ảnh
+
+Số lỗi: 220
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 100_1.jpg
+     Label: Đỗ Mạnh Nghĩa
+     Pred:  Đồ Mạnh Nghĩa
+     Word Acc: 66.7% | Char Acc: 92.3%
+
+  2. 100_10.jpg
+     Label: Nguyễn Quang Tùng
+     Pred:  Nguyễn Quang Từng
+     Word Acc: 66.7% | Char Acc: 94.1%
+
+  3. 100_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Đình Lâm Lâm
+     Word Acc: 66.7% | Char Acc: 63.6%
+
+  4. 100_7.jpg
+     Label: Đoàn Minh Phương
+     Pred:  Đoàn Mình Phương
+     Word Acc: 66.7% | Char Acc: 93.8%
+
+  5. 10_12.jpg
+     Label: Nguyễn Quý Đạt
+     Pred:  Nguyễn Quy Đạt
+     Word Acc: 66.7% | Char Acc: 92.9%
+
+  6. 11_12.jpg
+     Label: Nguyễn Quý Đạt
+     Pred:  Nguyễn Quy Đạt
+     Word Acc: 66.7% | Char Acc: 92.9%
+
+  7. 11_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Đinh Lâm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  8. 12_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Dinh Lâm
+     Word Acc: 66.7% | Char Acc: 81.8%
+
+  9. 12_7.jpg
+     Label: Đoàn Minh Phương
+     Pred:  Đoàn Mình Phương
+     Word Acc: 66.7% | Char Acc: 93.8%
+
+  10. 13_2.jpg
+     Label: Nguyễn Thị Hồng Ngân
+     Pred:  Nguyễn Thi Hồng Ngân
+     Word Acc: 75.0% | Char Acc: 95.0%
+
+----------------------------------------------------------------------
+VGG Seq2Seq (Pretrained VietOCR)
+----------------------------------------------------------------------
+Tổng số mẫu: 1500
+
+Kết quả:
+  - Exact Match Accuracy:    73.27% (1099/1500)
+  - Word-level Accuracy:     86.45%
+  - Character-level Accuracy: 92.00%
+  - Thời gian xử lý:          35.12s
+  - Tốc độ trung bình:        23.41ms/ảnh
+
+Số lỗi: 401
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 100_11.jpg
+     Label: Trần Tuấn Anh
+     Pred:  Trần Tuân Anh
+     Word Acc: 66.7% | Char Acc: 92.3%
+
+  2. 100_5.jpg
+     Label: Thân Nhân Chính
+     Pred:  Thân Nhân Chính Trang Trung Thi Thu Thi Thu Thi Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu
+     Word Acc: 0.0% | Char Acc: 0.0%
+
+  3. 10_11.jpg
+     Label: Trần Tuấn Anh
+     Pred:  Trần Tuần Anh
+     Word Acc: 66.7% | Char Acc: 92.3%
+
+  4. 10_12.jpg
+     Label: Nguyễn Quý Đạt
+     Pred:  Nguyễn Quy Đat
+     Word Acc: 33.3% | Char Acc: 85.7%
+
+  5. 10_3.jpg
+     Label: Lê Đức Thuận
+     Pred:  Đức Thuận
+     Word Acc: 66.7% | Char Acc: 75.0%
+
+  6. 10_4.jpg
+     Label: Nguyễn Tùng Dương
+     Pred:  Nguyên Tùng Dương
+     Word Acc: 66.7% | Char Acc: 94.1%
+
+  7. 11_1.jpg
+     Label: Đỗ Mạnh Nghĩa
+     Pred:  Đỗ Manh Nighĩa Trong Trang Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Thu Th
+     Word Acc: 0.0% | Char Acc: 0.0%
+
+  8. 11_11.jpg
+     Label: Trần Tuấn Anh
+     Pred:  Trần Tuần Anh
+     Word Acc: 66.7% | Char Acc: 92.3%
+
+  9. 11_12.jpg
+     Label: Nguyễn Quý Đạt
+     Pred:  Nguyễn Quy Đay
+     Word Acc: 33.3% | Char Acc: 78.6%
+
+  10. 11_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đô Đình Lâm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+----------------------------------------------------------------------
+VGG Transformer (Fine-tuned)
+----------------------------------------------------------------------
+Tổng số mẫu: 1500
+
+Kết quả:
+  - Exact Match Accuracy:    99.60% (1494/1500)
+  - Word-level Accuracy:     99.87%
+  - Character-level Accuracy: 99.97%
+  - Thời gian xử lý:          180.41s
+  - Tốc độ trung bình:        120.27ms/ảnh
+
+Số lỗi: 6
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 27_14.jpg
+     Label: Đào Quang Dương
+     Pred:  Đào Quang Dượng
+     Word Acc: 66.7% | Char Acc: 93.3%
+
+  2. 38_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Đình Lãm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  3. 5_3.jpg
+     Label: Lê Đức Thuận
+     Pred:  Lê Đức Thuân
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  4. 74_14.jpg
+     Label: Đào Quang Dương
+     Pred:  Đào Quang Dượng
+     Word Acc: 66.7% | Char Acc: 93.3%
+
+  5. 93_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Đình Lãm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  6. 94_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Đình Lãm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+----------------------------------------------------------------------
+VGG Seq2Seq (Fine-tuned)
+----------------------------------------------------------------------
+Tổng số mẫu: 1500
+
+Kết quả:
+  - Exact Match Accuracy:    99.80% (1497/1500)
+  - Word-level Accuracy:     99.93%
+  - Character-level Accuracy: 99.98%
+  - Thời gian xử lý:          26.57s
+  - Tốc độ trung bình:        17.71ms/ảnh
+
+Số lỗi: 3
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 5_3.jpg
+     Label: Lê Đức Thuận
+     Pred:  Lê Đức Thuân
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  2. 82_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Đình Lãm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  3. 94_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Đỗ Đình Lãm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+----------------------------------------------------------------------
+MobileNet-SVTR-CTC (Fine-tuned)
+----------------------------------------------------------------------
+Tổng số mẫu: 1500
+
+Kết quả:
+  - Exact Match Accuracy:    44.13% (662/1500)
+  - Word-level Accuracy:     72.38%
+  - Character-level Accuracy: 91.42%
+  - Thời gian xử lý:          9.90s
+  - Tốc độ trung bình:        6.60ms/ảnh
+
+Số lỗi: 838
+
+Ví dụ các lỗi (tối đa 10):
+
+  1. 100_14.jpg
+     Label: Đào Quang Dương
+     Pred:  Tào Quang Dượng
+     Word Acc: 33.3% | Char Acc: 86.7%
+
+  2. 100_15.jpg
+     Label: Đỗ Đình Lâm
+     Pred:  Tỗ Đình Lâm
+     Word Acc: 66.7% | Char Acc: 90.9%
+
+  3. 100_3.jpg
+     Label: Lê Đức Thuận
+     Pred:  Lê Đức Thuền
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  4. 100_4.jpg
+     Label: Nguyễn Tùng Dương
+     Pred:  Nguyễn Tung Dượng
+     Word Acc: 33.3% | Char Acc: 88.2%
+
+  5. 100_5.jpg
+     Label: Thân Nhân Chính
+     Pred:  Thân Nhận Chính
+     Word Acc: 66.7% | Char Acc: 93.3%
+
+  6. 100_7.jpg
+     Label: Đoàn Minh Phương
+     Pred:  Đroàn Minh Phưởng
+     Word Acc: 33.3% | Char Acc: 87.5%
+
+  7. 10_13.jpg
+     Label: Nguyễn Đình Quang Dũng
+     Pred:  Nguyễn Đinh Quang Dũng
+     Word Acc: 75.0% | Char Acc: 95.5%
+
+  8. 10_14.jpg
+     Label: Đào Quang Dương
+     Pred:  Đào Quang Dưỳng
+     Word Acc: 66.7% | Char Acc: 93.3%
+
+  9. 10_3.jpg
+     Label: Lê Đức Thuận
+     Pred:  Lê Đức Thun
+     Word Acc: 66.7% | Char Acc: 91.7%
+
+  10. 10_4.jpg
+     Label: Nguyễn Tùng Dương
+     Pred:  Nguyễn Tung Dương
+     Word Acc: 66.7% | Char Acc: 94.1%
+
+
+======================================================================
+SO SÁNH CÁC MÔ HÌNH
+======================================================================
+
+Xếp hạng theo Exact Match Accuracy:
+  1. VGG Seq2Seq (Fine-tuned)                  99.80%
+  2. VGG Transformer (Fine-tuned)              99.60%
+  3. VGG Transformer (Pretrained VietOCR)      85.33%
+  4. VGG Seq2Seq (Pretrained VietOCR)          73.27%
+  5. MobileNet-SVTR-CTC (Fine-tuned)           44.13%
+
+Xếp hạng theo Word-level Accuracy:
+  1. VGG Seq2Seq (Fine-tuned)                  99.93%
+  2. VGG Transformer (Fine-tuned)              99.87%
+  3. VGG Transformer (Pretrained VietOCR)      93.13%
+  4. VGG Seq2Seq (Pretrained VietOCR)          86.45%
+  5. MobileNet-SVTR-CTC (Fine-tuned)           72.38%
+
+Xếp hạng theo Character-level Accuracy:
+  1. VGG Seq2Seq (Fine-tuned)                  99.98%
+  2. VGG Transformer (Fine-tuned)              99.97%
+  3. VGG Transformer (Pretrained VietOCR)      95.98%
+  4. VGG Seq2Seq (Pretrained VietOCR)          92.00%
+  5. MobileNet-SVTR-CTC (Fine-tuned)           91.42%
+
+Xếp hạng theo Tốc độ (nhanh nhất):
+  1. MobileNet-SVTR-CTC (Fine-tuned)            6.60ms/ảnh
+  2. VGG Seq2Seq (Fine-tuned)                  17.71ms/ảnh
+  3. VGG Seq2Seq (Pretrained VietOCR)          23.41ms/ảnh
+  4. VGG Transformer (Fine-tuned)             120.27ms/ảnh
+  5. VGG Transformer (Pretrained VietOCR)     125.91ms/ảnh
+
+======================================================================
+KẾT LUẬN
+======================================================================
+
+Mô hình chính xác nhất (Exact Match): VGG Seq2Seq (Fine-tuned)
+  - Exact Match Accuracy: 99.80%
+  - Word-level Accuracy: 99.93%
+  - Character-level Accuracy: 99.98%
+  - Tốc độ: 17.71ms/ảnh
+
+Mô hình nhanh nhất: MobileNet-SVTR-CTC (Fine-tuned)
+  - Tốc độ: 6.60ms/ảnh
+  - Exact Match Accuracy: 44.13%
+  - Word-level Accuracy: 72.38%
+  - Character-level Accuracy: 91.42%
+
+======================================================================
